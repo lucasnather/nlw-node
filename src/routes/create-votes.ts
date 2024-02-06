@@ -18,7 +18,7 @@ export async function createVotes(app: FastifyInstance) {
         const { pollId } = getParamsSchema.parse(request.params)
         const { pollsOptionId } = getBodySchema.parse(request.body)
 
-        let { sessionId } = reply.cookies
+        let { sessionId } = request.cookies
 
         if(sessionId) {
 
