@@ -21,7 +21,26 @@ export async function createVotes(app: FastifyInstance) {
         let { sessionId } = request.cookies
 
         if(sessionId) {
+            const findVotesPoll = await prisma.votes.findUnique({
+                where: {
+                    sessionId_pollId: {
+                        sessionId,
+                        pollId
+                    }
+                }
+            })
 
+            if(findVotesPoll && findVotesPoll.pollsOptionId !== pollsOptionId) {
+                await prisma.votes.delete({
+                    where: {
+                        id: findVotesPoll.id
+                    }
+                })
+            } else if(findVotesPoll) {
+                return reply.send({
+                    message: 'You already voted in this poll'
+                })
+            }
         }
 
         if(!sessionId) {
