@@ -1,8 +1,9 @@
 import fastify from 'fastify'
 import cookie from '@fastify/cookie'
-import { createPoll } from './routes/create-poll'
-import { getPoll } from './routes/get-poll'
-import { createVotes } from './routes/create-votes'
+import websocket from '@fastify/websocket'
+import { createPoll } from './http/routes/create-poll'
+import { getPoll } from './http/routes/get-poll'
+import { createVotes } from './http/routes/create-votes'
 
 export const app = fastify()
 
@@ -10,6 +11,8 @@ app.register(cookie, {
     secret: 'talvez-seja-secreta',
     hook: 'onRequest'
 })
+
+app.register(websocket)
 
 app.register(createPoll)
 app.register(getPoll)

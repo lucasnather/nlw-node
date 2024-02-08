@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { FastifyInstance } from "fastify";
 import z from "zod";
-import { prisma } from "../lib/prisma";
-import { redis } from "../lib/redis";
+import { prisma } from "../../lib/prisma";
+import { redis } from "../../lib/redis";
 
 export async function createVotes(app: FastifyInstance) {
 
