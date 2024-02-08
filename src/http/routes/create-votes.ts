@@ -1,8 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { FastifyInstance } from "fastify";
 import z from "zod";
-import { prisma } from "../lib/prisma";
-import { redis } from "../lib/redis";
+import { prisma } from "../../lib/prisma";
+import { redis } from "../../lib/redis";
+import { voting } from "../../utils/voting-pub-sub";
 
 export async function createVotes(app: FastifyInstance) {
 
@@ -38,7 +39,12 @@ export async function createVotes(app: FastifyInstance) {
                     }
                 })
 
-                await redis.zincrby(pollId, -1, deleteVote.pollsOptionId)
+                const votes = await redis.zincrby(pollId, -1, deleteVote.pollsOptionId)
+
+                voting.publish(pollId, {
+                    pollsOptionId: deleteVote.pollsOptionId,
+                    votes: Number(votes)
+                })
             } else if(findVotesPoll) {
                 return reply.send({
                     message: 'You already voted in this poll'
@@ -66,7 +72,12 @@ export async function createVotes(app: FastifyInstance) {
             }
         })
 
-        await redis.zincrby(pollId, 1, pollsOptionId)
+       const votes = await redis.zincrby(pollId, 1, pollsOptionId)
+
+       voting.publish(pollId, {
+        pollsOptionId,
+        votes: Number(votes)
+       })
 
         return reply.status(201).send()
     })
